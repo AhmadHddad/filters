@@ -1,6 +1,6 @@
 import { createStyles, Theme } from "@material-ui/core";
 
-export default function LogoStyles(theme: Theme) {
+const LogoStyles = (theme: Theme) => {
   return createStyles({
     titleContainer: {
       marginLeft: 16,
@@ -14,4 +14,6 @@ export default function LogoStyles(theme: Theme) {
       filter: "invert()",
     },
   });
-}
+};
+
+export default LogoStyles;
