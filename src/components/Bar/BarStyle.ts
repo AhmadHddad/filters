@@ -4,7 +4,6 @@ const BarStyles = (theme: Theme) =>
   createStyles({
     bar: {
       display: "flex",
-      justifyContent: "start",
       flexWrap: "wrap",
       listStyle: "none",
       padding: theme.spacing(0.5),
