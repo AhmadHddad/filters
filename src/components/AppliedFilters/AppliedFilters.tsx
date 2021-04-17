@@ -4,6 +4,7 @@ import AppliedFiltersList, {
 } from './../AppliedFiltersList/AppliedFiltersList';
 import Grid from '@material-ui/core/Grid';
 import { Typography } from '@material-ui/core';
+import { isNullOrEmpty } from '../../utils/utils';
 
 export interface IAppliedFiltersProps extends IAppliedFiltersListProps {}
 
@@ -15,7 +16,11 @@ export default function AppliedFilters(props: IAppliedFiltersProps) {
             <Typography display="inline">Applied Filters:</Typography>
          </Grid>
          <Grid item>
-            <AppliedFiltersList {...rest} />
+            {isNullOrEmpty(props.list) ? (
+               <Typography display="inline">-None-</Typography>
+            ) : (
+               <AppliedFiltersList {...rest} />
+            )}
          </Grid>
       </Grid>
    );
