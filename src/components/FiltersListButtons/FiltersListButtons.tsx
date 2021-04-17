@@ -3,12 +3,13 @@ import { Grid, GridProps, Button, makeStyles } from '@material-ui/core';
 import FiltersListButtonsStyles from './filtersListButtonsStyles';
 import { IFiltersList } from '../../attachmentData';
 import classNames from 'clsx';
+import { IDivClickEvent } from '../../shared/interfaces';
 
 export interface IFiltersListButtonsProps extends GridProps {
    filtersList?: IFiltersList;
    fullWidth?: boolean;
    selectedFilters?: { [filterId: string]: boolean };
-   onFilterClicked?: React.MouseEventHandler<HTMLButtonElement>;
+   onFilterClicked?: IDivClickEvent;
 }
 
 const useStyle = makeStyles(FiltersListButtonsStyles);
