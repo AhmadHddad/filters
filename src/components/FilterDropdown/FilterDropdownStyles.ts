@@ -1,13 +1,19 @@
 import { createStyles, Theme } from '@material-ui/core/styles';
+import { IFilterDropdownProps } from './filterDropdown';
 
-const FilterDropdownStyles = (theme: Theme) =>
+const filterDropdownStyles = (theme: Theme) =>
    createStyles({
-      gridContainer: { width: 300, height: 300 },
-      actionsContainer: {
-         '&>div': {
-            padding: 2,
-         },
+      paperContainer: (props: IFilterDropdownProps) => ({
+         width: props.isMobile ? '100%' : '300px',
+         height: '300px',
+      }),
+      gridContainer: {
+         width: '100%',
+         height: '100%',
+      },
+      buttonsListContainer: {
+         height: '80%',
       },
    });
 
-export default FilterDropdownStyles;
+export default filterDropdownStyles;

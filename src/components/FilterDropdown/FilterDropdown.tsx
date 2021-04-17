@@ -5,8 +5,8 @@ import classNames from 'clsx';
 import { IFiltersList } from '../../attachmentData';
 
 import FiltersListButtons from '../FiltersListButtons/FiltersListButtons';
-import FilterDropdownStyles from './FilterDropdownStyles';
-import FilterDropdownActions from './FilterDropdownActions';
+import filterDropdownStyles from './FilterDropdownStyles';
+import FilterDropdownActions from '../FilterDropdownActions/FilterDropdownActions';
 import { IButtonClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
 
 export interface IFilterDropdownProps extends PopoverProps {
@@ -17,21 +17,22 @@ export interface IFilterDropdownProps extends PopoverProps {
    onApplyFilter?: IButtonClickEvent;
    onCancelClick?: IButtonClickEvent;
    isChanged?: boolean;
+   isMobile?: boolean;
 }
 
-const useStyle = makeStyles(FilterDropdownStyles);
+const useStyle = makeStyles(filterDropdownStyles);
 
 const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) => {
    const {
       anchorEl,
       gridContainerProps,
       open,
-      className,
       onSelectFilter,
       onApplyFilter,
       onCancelClick,
       filtersList,
       selectedFilters,
+      isMobile,
       isChanged,
       ...rest
    } = props;
@@ -40,15 +41,22 @@ const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) =>
    const show = Boolean(anchorEl);
 
    return (
-      <Popover open={show} anchorEl={anchorEl} transitionDuration={100} {...rest}>
+      <Popover
+         open={show}
+         anchorEl={anchorEl}
+         transitionDuration={100}
+         classes={{ paper: classes.paperContainer }}
+         {...rest}
+      >
          <Grid
             container
             justify="space-between"
-            className={classNames(className, classes.gridContainer)}
+            className={classNames(gridContainerProps?.className, classes.gridContainer)}
             {...gridContainerProps}
          >
             <FiltersListButtons
                item
+               className={classes.buttonsListContainer}
                filtersList={filtersList}
                onFilterClicked={onSelectFilter}
                selectedFilters={selectedFilters}
