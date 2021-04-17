@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Grid, GridProps, Button, makeStyles } from '@material-ui/core';
-import FiltersListButtonsStyles from './FiltersListButtonsStyles';
+import FiltersListButtonsStyles from './filtersListButtonsStyles';
 import { IFiltersList } from '../../attachmentData';
 import classNames from 'clsx';
 

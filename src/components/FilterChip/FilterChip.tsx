@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Chip, { ChipProps } from '@material-ui/core/Chip';
-import FilterChipStyle from './FilterChipStyle';
+import filterChipStyle from './filterChipStyle';
 import classNames from 'clsx';
 
-const useStyles = makeStyles(FilterChipStyle);
+const useStyles = makeStyles(filterChipStyle);
 
 export interface IFilterChipProps extends ChipProps {
    selected?: boolean;

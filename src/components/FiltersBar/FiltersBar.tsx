@@ -4,9 +4,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Bar from '../Bar/Bar';
 import FilterChip from '../FilterChip/FilterChip';
 import { IFilterCat } from '../../containers/FiltersBarContainer/FiltersBarContainer';
-import FiltersBarStyles from './FiltersBarStyles';
+import filtersBarStyles from './filtersBarStyles';
 
-const useStyles = makeStyles(FiltersBarStyles);
+const useStyles = makeStyles(filtersBarStyles);
 
 export interface FiltersBarProps {
    filterCatList: IFilterCat[];

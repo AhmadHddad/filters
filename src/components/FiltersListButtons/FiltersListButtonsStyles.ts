@@ -1,6 +1,6 @@
 import { createStyles, Theme } from '@material-ui/core/styles';
 
-const FiltersListButtons = (theme: Theme) =>
+const filtersListButtons = (theme: Theme) =>
    createStyles({
       gridContainer: {
          overflow: 'auto',
@@ -11,4 +11,4 @@ const FiltersListButtons = (theme: Theme) =>
       },
    });
 
-export default FiltersListButtons;
+export default filtersListButtons;

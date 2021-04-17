@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Grid, GridProps, Button, makeStyles } from '@material-ui/core';
 import classNames from 'clsx';
 import { IButtonClickEvent } from '../../shared/interfaces';
-import FilterDropdownActionsStyles from './FilterDropdownActionsStyles';
+import filterDropdownActionsStyles from './filterDropdownActionsStyles';
 
 interface IFilterDropdownActionsProps extends GridProps {
    hideCancel?: boolean;
@@ -12,7 +12,7 @@ interface IFilterDropdownActionsProps extends GridProps {
    onApplyClick?: IButtonClickEvent;
    onCancelClick?: IButtonClickEvent;
 }
-const useStyle = makeStyles(FilterDropdownActionsStyles);
+const useStyle = makeStyles(filterDropdownActionsStyles);
 
 const FilterDropdownActions: React.FunctionComponent<IFilterDropdownActionsProps> = (props) => {
    const {

@@ -1,6 +1,6 @@
 import { createStyles, Theme } from '@material-ui/core/styles';
 
-const FilterDropdownActionsStyles = (theme: Theme) =>
+const filterDropdownActionsStyles = (theme: Theme) =>
    createStyles({
       actionsContainer: {
          '&>div': {
@@ -9,4 +9,4 @@ const FilterDropdownActionsStyles = (theme: Theme) =>
       },
    });
 
-export default FilterDropdownActionsStyles;
+export default filterDropdownActionsStyles;
