@@ -2,6 +2,7 @@ import { ChipProps, makeStyles } from '@material-ui/core';
 import * as React from 'react';
 import appliedFiltersListStyles from './appliedFiltersListStyles';
 import FilterChip from '../FilterChip/FilterChip';
+import { IAppliedFilter } from '../../containers/FiltersBarContainer/FiltersBarContainer';
 export interface IAppliedFiltersListProps {
    chipProps?: ChipProps;
    rootContainerProps?: React.DetailedHTMLProps<
@@ -12,8 +13,8 @@ export interface IAppliedFiltersListProps {
       React.LiHTMLAttributes<HTMLLIElement>,
       HTMLLIElement
    >;
-   list?: string[];
-   onDelete?: (label: string) => void;
+   list?: IAppliedFilter[];
+   onDelete?: (label: string, category: string) => void;
 }
 
 const useStyle = makeStyles(appliedFiltersListStyles);
@@ -25,14 +26,14 @@ export default function AppliedFiltersList(props: IAppliedFiltersListProps) {
 
    return (
       <ul className={classes.root} {...rootContainerProps}>
-         {list?.map((label) => {
+         {list?.map(({ label, category }) => {
             return (
                <li key={label} {...listContainerProps}>
                   <FilterChip
                      name={label}
                      square
                      label={label}
-                     onDelete={() => onDelete?.(label)}
+                     onDelete={() => onDelete?.(label, category)}
                      {...chipProps}
                   />
                </li>
