@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Popover, PopoverProps, Grid, GridProps, Button, makeStyles } from '@material-ui/core';
+import { Popover, PopoverProps, Grid, GridProps, makeStyles } from '@material-ui/core';
 import classNames from 'clsx';
 
 import { IFiltersList } from '../../attachmentData';
@@ -7,16 +7,20 @@ import { IFiltersList } from '../../attachmentData';
 import FiltersListButtons from '../FiltersListButtons/FiltersListButtons';
 import FilterDropdownStyles from './FilterDropdownStyles';
 import FilterDropdownActions from './FilterDropdownActions';
+import { IButtonClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
 
-interface IFilterDropdownProps extends PopoverProps {
+export interface IFilterDropdownProps extends PopoverProps {
    gridContainerProps?: GridProps;
    filtersList?: IFiltersList;
-   selectedFilters?: { [filterId: string]: boolean };
-   onSelectFilter?: React.MouseEventHandler<HTMLButtonElement>;
-   onApplyFilter?: React.MouseEventHandler<HTMLButtonElement>;
+   selectedFilters?: IKeyValueDictionary<boolean>;
+   onSelectFilter?: IButtonClickEvent;
+   onApplyFilter?: IButtonClickEvent;
+   onCancelClick?: IButtonClickEvent;
+   isChanged?: boolean;
 }
 
 const useStyle = makeStyles(FilterDropdownStyles);
+
 const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) => {
    const {
       anchorEl,
@@ -24,9 +28,11 @@ const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) =>
       open,
       className,
       onSelectFilter,
-      onApplyFilter: onApplyClick,
+      onApplyFilter,
+      onCancelClick,
       filtersList,
       selectedFilters,
+      isChanged,
       ...rest
    } = props;
 
@@ -47,7 +53,12 @@ const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) =>
                onFilterClicked={onSelectFilter}
                selectedFilters={selectedFilters}
             />
-            <FilterDropdownActions onApplyClick={onApplyClick} />
+            <FilterDropdownActions
+               disableApply={!isChanged}
+               hideCancel={!isChanged}
+               onApplyClick={onApplyFilter}
+               onCancelClick={onCancelClick}
+            />
          </Grid>
       </Popover>
    );
