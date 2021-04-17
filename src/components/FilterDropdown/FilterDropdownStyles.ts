@@ -1,5 +1,5 @@
 import { createStyles, Theme } from '@material-ui/core/styles';
-import { IFilterDropdownProps } from './filterDropdown';
+import { IFilterDropdownProps } from './FilterDropdown';
 
 const filterDropdownStyles = (theme: Theme) =>
    createStyles({

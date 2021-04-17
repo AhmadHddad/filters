@@ -5,9 +5,9 @@ import classNames from 'clsx';
 import { IFiltersList } from '../../attachmentData';
 
 import FiltersListButtons from '../FiltersListButtons/FiltersListButtons';
-import filterDropdownStyles from './FilterDropdownStyles';
 import FilterDropdownActions from '../FilterDropdownActions/FilterDropdownActions';
 import { IButtonClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
+import filterDropdownStyles from './filterDropdownStyles';
 
 export interface IFilterDropdownProps extends PopoverProps {
    gridContainerProps?: GridProps;
