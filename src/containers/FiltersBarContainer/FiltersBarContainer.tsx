@@ -1,10 +1,11 @@
-import { useMediaQuery } from '@material-ui/core';
+import { useMediaQuery, Grid } from '@material-ui/core';
 import * as React from 'react';
 import attachmentData from '../../attachmentData';
 import FiltersBar from '../../components/FiltersBar/FiltersBar';
-import FilterDropdown from '../../components/FilterDropdown/FilterDropdown';
+import FilterDropdown from '../../components/FilterDropdown/filterDropdown';
 import { IButtonClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
 import { MORE_FILTERS_FILTER_CAT } from '../../hooks/contants';
+import AppliedFilters from './../../components/AppliedFilters/AppliedFilters';
 
 interface IFiltersBarContainerProps {}
 
@@ -163,6 +164,11 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
             onFilterCatSelected={onFilterCatSelected}
             isMobile={isMobile}
          />
+         <Grid container justify={'center'} style={{ flexGrow: 1 }}>
+            <Grid item md={12} xs={12}>
+               <AppliedFilters />
+            </Grid>
+         </Grid>
       </>
    );
 };
