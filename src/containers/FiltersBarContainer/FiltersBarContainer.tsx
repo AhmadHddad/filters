@@ -3,13 +3,14 @@ import * as React from 'react';
 import attachmentData from '../../attachmentData';
 import FiltersBar from '../../components/FiltersBar/FiltersBar';
 import FilterDropdown from '../../components/FilterDropdown/FilterDropdown';
+import { IButtonClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
 
 interface IFiltersBarContainerProps {}
 
 export type IFilterCat = { label: string; appliedFilters: string[] };
-export type ISelectedFilters = {
-   [label: string]: boolean;
-};
+export type ISelectedFilters = IKeyValueDictionary<boolean>;
+export type IChangedSelectedFiltersCat = IKeyValueDictionary<boolean>;
+
 const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = (props) => {
    //#region State
    const [appliedFilters, setAppliedFilters] = React.useState([]);
@@ -22,6 +23,10 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
    const [anchorEl, setAnchorEl] = React.useState(null);
    const [selectedFilterCat, setSelectedFilterCat] = React.useState('');
    const [selectedFilters, setSelectedFilters] = React.useState<ISelectedFilters>({});
+   const [
+      changedSelectedFiltersCat,
+      setChangedSelectedFiltersCat,
+   ] = React.useState<IChangedSelectedFiltersCat>({});
    //#endregion
 
    //#region Other Hooks
@@ -38,10 +43,20 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
       },
       [selectedFilters],
    );
+
+   const toggleChangedSelectedFiltersCat = React.useCallback(
+      (state: boolean) => {
+         return (prevState: IChangedSelectedFiltersCat) => ({
+            ...prevState,
+            [selectedFilterCat]: state,
+         });
+      },
+      [selectedFilterCat],
+   );
    //#endregion
 
    //#region Callbacks
-   const onFilterCatSelected = React.useCallback(
+   const onFilterCatSelected = React.useCallback<IButtonClickEvent>(
       (event: React.MouseEvent<any, MouseEvent>) => {
          const filterCatLabel: string = event.currentTarget.id;
 
@@ -66,9 +81,10 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
       setAnchorEl(null);
       setSelectedFilterCat('');
       setSelectedFilters({});
-   }, []);
+      setChangedSelectedFiltersCat(toggleChangedSelectedFiltersCat(false));
+   }, [toggleChangedSelectedFiltersCat]);
 
-   const onApplyFilter = React.useCallback(
+   const onApplyFilter = React.useCallback<IButtonClickEvent>(
       (_) => {
          setFilterCatList((prev) => {
             const updatedFiltersCatList = [...prev];
@@ -87,36 +103,44 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
          });
 
          onCloseDropdown();
+         setChangedSelectedFiltersCat(toggleChangedSelectedFiltersCat(false));
       },
-      [selectedFilterCat, updateFiltersCatList, onCloseDropdown],
+      [selectedFilterCat, updateFiltersCatList, onCloseDropdown, toggleChangedSelectedFiltersCat],
    );
 
-   const onSelectFilter = React.useCallback((e) => {
-      const id = e.currentTarget.id;
-      setSelectedFilters((prev) => {
-         const updatedSelectedFilter = { ...prev };
+   const onSelectFilter = React.useCallback<IButtonClickEvent>(
+      (e) => {
+         const id: string = e.currentTarget.id;
+         setSelectedFilters((prev) => {
+            const updatedSelectedFilter = { ...prev };
+            // wants to deselect so i will delete the key to filter obj
+            if (Boolean(prev[id])) {
+               delete updatedSelectedFilter[id];
+            } else {
+               updatedSelectedFilter[id] = true;
+            }
 
-         // wants to deselect so i will delete the key to filter obj
-         if (Boolean(prev[id])) {
-            delete updatedSelectedFilter[id];
-         } else {
-            updatedSelectedFilter[id] = true;
-         }
+            return updatedSelectedFilter;
+         });
 
-         return updatedSelectedFilter;
-      });
-   }, []);
+         setChangedSelectedFiltersCat(toggleChangedSelectedFiltersCat(true));
+      },
+      [toggleChangedSelectedFiltersCat],
+   );
+
    //#endregion
 
    return (
       <>
          <FilterDropdown
             anchorEl={anchorEl}
+            isChanged={changedSelectedFiltersCat[selectedFilterCat]}
             onClose={onCloseDropdown}
             filtersList={attachmentData[selectedFilterCat]}
             selectedFilters={selectedFilters}
             onSelectFilter={onSelectFilter}
             onApplyFilter={onApplyFilter}
+            onCancelClick={onCloseDropdown}
          />
          <FiltersBar
             selectedFilterCat={selectedFilterCat}
