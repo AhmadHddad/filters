@@ -27,13 +27,9 @@ const FiltersBar: React.FunctionComponent<FiltersBarProps> = (props) => {
    } = props;
    const classes = useStyles(props);
 
-   const list = isMobile
-      ? [...filterCatList.slice(0, 2), { label: 'More filters', appliedFilters: [] }]
-      : filterCatList;
-
    return (
       <Bar className={classes.bar} {...rest}>
-         {list.map(({ label, appliedFilters }) => (
+         {filterCatList.map(({ label, appliedFilters }) => (
             <FilterChip
                className={classes.chip}
                selected={selectedFilterCat === label}
