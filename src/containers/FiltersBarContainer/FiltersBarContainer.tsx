@@ -14,6 +14,10 @@ export type IFilterCat = { label: string; appliedFilters: string[] };
 export type ISelectedFilters = IKeyValueDictionary<boolean>;
 export type IChangedSelectedFiltersCat = IKeyValueDictionary<boolean>;
 export type IAppliedFilter = { label: string; category: string };
+export type IUpdateFiltersCatListOptionalParameters = {
+   labelToDelete?: string;
+   selectedFilterCat: string;
+};
 
 const useStyle = makeStyles(filtersBarContainerStyles);
 
@@ -43,11 +47,37 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
 
    //#region Other Functions
    const updateFiltersCatList = React.useCallback(
-      (filtersCatList: IFilterCat[], selectedFiltersCatIndex: number) => {
-         const updatedFilter = { ...filtersCatList[selectedFiltersCatIndex] };
-         updatedFilter.appliedFilters = Object.keys(selectedFilters);
+      (
+         type: 'deleteFilter' | 'updateCatList',
+         { labelToDelete, selectedFilterCat }: IUpdateFiltersCatListOptionalParameters,
+      ) => (prev: IFilterCat[]) => {
+         const updatedFiltersCatList = [...prev];
+         const prevSelectedFilterCatIndex = prev.findIndex(
+            (cat) => cat.label === selectedFilterCat,
+         );
 
-         return updatedFilter;
+         if (prevSelectedFilterCatIndex === -1) return prev;
+
+         const updatedFilter = { ...updatedFiltersCatList[prevSelectedFilterCatIndex] };
+
+         switch (type) {
+            case 'deleteFilter':
+               updatedFilter.appliedFilters = updatedFilter.appliedFilters.filter(
+                  (filterLabel) => filterLabel !== labelToDelete,
+               );
+
+               break;
+            case 'updateCatList':
+               updatedFilter.appliedFilters = Object.keys(selectedFilters);
+
+               break;
+            default:
+               break;
+         }
+
+         updatedFiltersCatList[prevSelectedFilterCatIndex] = updatedFilter;
+
+         return updatedFiltersCatList;
       },
       [selectedFilters],
    );
@@ -66,22 +96,17 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
 
    //#region Callbacks
 
-   const onDeleteAppliedFilter = React.useCallback((label: string, category: string) => {
-      setFilterCatList((prev) => {
-         const updatedFiltersCatList = [...prev];
-         const prevSelectedFilterCatIndex = prev.findIndex((cat) => cat.label === category);
-
-         if (prevSelectedFilterCatIndex !== -1) {
-            const updatedFilter = { ...updatedFiltersCatList[prevSelectedFilterCatIndex] };
-            updatedFilter.appliedFilters = updatedFilter.appliedFilters.filter(
-               (filterLabel) => filterLabel !== label,
-            );
-            updatedFiltersCatList[prevSelectedFilterCatIndex] = updatedFilter;
-         }
-
-         return updatedFiltersCatList;
-      });
-   }, []);
+   const onDeleteAppliedFilter = React.useCallback(
+      (label: string, category: string) => {
+         setFilterCatList(
+            updateFiltersCatList('deleteFilter', {
+               selectedFilterCat: category,
+               labelToDelete: label,
+            }),
+         );
+      },
+      [updateFiltersCatList],
+   );
 
    const onFilterCatSelected = React.useCallback<IDivClickEvent>(
       (event) => {
@@ -113,21 +138,11 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
 
    const onApplyFilter = React.useCallback<IButtonClickEvent>(
       (_) => {
-         setFilterCatList((prev) => {
-            const updatedFiltersCatList = [...prev];
-            const prevSelectedFilterCatIndex = prev.findIndex(
-               (cat) => cat.label === selectedFilterCat,
-            );
-
-            if (prevSelectedFilterCatIndex !== -1) {
-               updatedFiltersCatList[prevSelectedFilterCatIndex] = updateFiltersCatList(
-                  updatedFiltersCatList,
-                  prevSelectedFilterCatIndex,
-               );
-            }
-
-            return updatedFiltersCatList;
-         });
+         setFilterCatList(
+            updateFiltersCatList('updateCatList', {
+               selectedFilterCat: selectedFilterCat,
+            }),
+         );
 
          onCloseDropdown();
          setChangedSelectedFiltersCat(toggleChangedSelectedFiltersCat(false));
