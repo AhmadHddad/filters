@@ -13,6 +13,7 @@ interface IFiltersBarContainerProps {}
 export type IFilterCat = { label: string; appliedFilters: string[] };
 export type ISelectedFilters = IKeyValueDictionary<boolean>;
 export type IChangedSelectedFiltersCat = IKeyValueDictionary<boolean>;
+export type IAppliedFilter = { label: string; category: string };
 
 const useStyle = makeStyles(filtersBarContainerStyles);
 
@@ -29,7 +30,7 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
    //#endregion
 
    //#region State
-   const [appliedFilters, setAppliedFilters] = React.useState<string[]>([]);
+   const [appliedFilters, setAppliedFilters] = React.useState<IAppliedFilter[]>([]);
    const [filterCatList, setFilterCatList] = React.useState<IFilterCat[]>([]);
    const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
    const [selectedFilterCat, setSelectedFilterCat] = React.useState('');
@@ -65,11 +66,21 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
 
    //#region Callbacks
 
-   const onDeleteAppliedFilter = React.useCallback((label: string) => {
-      console.log(
-         '🚀 ~ file: FiltersBarContainer.tsx ~ line 69 ~ onDeleteAppliedFilter ~ label',
-         label,
-      );
+   const onDeleteAppliedFilter = React.useCallback((label: string, category: string) => {
+      setFilterCatList((prev) => {
+         const updatedFiltersCatList = [...prev];
+         const prevSelectedFilterCatIndex = prev.findIndex((cat) => cat.label === category);
+
+         if (prevSelectedFilterCatIndex !== -1) {
+            const updatedFilter = { ...updatedFiltersCatList[prevSelectedFilterCatIndex] };
+            updatedFilter.appliedFilters = updatedFilter.appliedFilters.filter(
+               (filterLabel) => filterLabel !== label,
+            );
+            updatedFiltersCatList[prevSelectedFilterCatIndex] = updatedFilter;
+         }
+
+         return updatedFiltersCatList;
+      });
    }, []);
 
    const onFilterCatSelected = React.useCallback<IDivClickEvent>(
@@ -158,10 +169,10 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
    }, [isMobile, allFiltersCatList]);
 
    React.useEffect(() => {
-      const list: string[] = [];
+      const list: IAppliedFilter[] = [];
 
       filterCatList.forEach((cat) => {
-         list.push(...cat.appliedFilters);
+         list.push(...cat.appliedFilters.map((filter) => ({ category: cat.label, label: filter })));
       });
 
       setAppliedFilters(list);
