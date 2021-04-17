@@ -4,6 +4,7 @@ import attachmentData from '../../attachmentData';
 import FiltersBar from '../../components/FiltersBar/FiltersBar';
 import FilterDropdown from '../../components/FilterDropdown/FilterDropdown';
 import { IButtonClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
+import { MORE_FILTERS_FILTER_CAT } from '../../hooks/contants';
 
 interface IFiltersBarContainerProps {}
 
@@ -12,14 +13,19 @@ export type ISelectedFilters = IKeyValueDictionary<boolean>;
 export type IChangedSelectedFiltersCat = IKeyValueDictionary<boolean>;
 
 const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = (props) => {
-   //#region State
-   const [appliedFilters, setAppliedFilters] = React.useState([]);
-   const [filterCatList, setFilterCatList] = React.useState<IFilterCat[]>(
+   //#region Other Hooks
+   const isMobile = useMediaQuery('(max-width:600px)');
+   const { current: allFiltersCatList } = React.useRef<IFilterCat[]>(
       Object.keys(attachmentData).map((key) => ({
          label: key,
          appliedFilters: [] as string[],
       })),
    );
+   //#endregion
+
+   //#region State
+   const [appliedFilters, setAppliedFilters] = React.useState([]);
+   const [filterCatList, setFilterCatList] = React.useState<IFilterCat[]>([]);
    const [anchorEl, setAnchorEl] = React.useState(null);
    const [selectedFilterCat, setSelectedFilterCat] = React.useState('');
    const [selectedFilters, setSelectedFilters] = React.useState<ISelectedFilters>({});
@@ -27,10 +33,6 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
       changedSelectedFiltersCat,
       setChangedSelectedFiltersCat,
    ] = React.useState<IChangedSelectedFiltersCat>({});
-   //#endregion
-
-   //#region Other Hooks
-   const isMobile = useMediaQuery('(max-width:600px)');
    //#endregion
 
    //#region Other Functions
@@ -127,7 +129,19 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
       },
       [toggleChangedSelectedFiltersCat],
    );
+   //#endregion
 
+   //#region LifeCycle
+   React.useEffect(() => {
+      const list = isMobile
+         ? [
+              ...allFiltersCatList.slice(0, 2),
+              { label: MORE_FILTERS_FILTER_CAT, appliedFilters: [] },
+           ]
+         : allFiltersCatList;
+
+      setFilterCatList(list);
+   }, [isMobile, allFiltersCatList]);
    //#endregion
 
    return (
@@ -138,6 +152,7 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
             onClose={onCloseDropdown}
             filtersList={attachmentData[selectedFilterCat]}
             selectedFilters={selectedFilters}
+            isMobile={isMobile}
             onSelectFilter={onSelectFilter}
             onApplyFilter={onApplyFilter}
             onCancelClick={onCloseDropdown}
