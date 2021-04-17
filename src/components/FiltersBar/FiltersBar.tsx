@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import classNames from 'clsx';
 
 import Bar from '../Bar/Bar';
 import FilterChip from '../FilterChip/FilterChip';
@@ -28,7 +29,7 @@ const FiltersBar: React.FunctionComponent<FiltersBarProps> = (props) => {
    const classes = useStyles(props);
 
    return (
-      <Bar className={classes.bar} {...rest}>
+      <Bar className={classNames(classes.bar, className)} {...rest}>
          {filterCatList.map(({ label, appliedFilters }) => (
             <FilterChip
                className={classes.chip}
