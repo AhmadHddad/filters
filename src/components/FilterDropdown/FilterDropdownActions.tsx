@@ -1,31 +1,44 @@
 import * as React from 'react';
-import { Popover, PopoverProps, Grid, GridProps, Button, makeStyles } from '@material-ui/core';
+import { Grid, GridProps, Button, makeStyles } from '@material-ui/core';
 import classNames from 'clsx';
 import FilterDropdownStyles from './FilterDropdownStyles';
+import { IButtonClickEvent } from '../../shared/interfaces';
 
 interface IFilterDropdownActionsProps extends GridProps {
    hideCancel?: boolean;
    hideApply?: boolean;
-   onApplyClick?: React.MouseEventHandler<any>;
-   onCancelClick?: React.MouseEventHandler<any>;
+   disableCancel?: boolean;
+   disableApply?: boolean;
+   onApplyClick?: IButtonClickEvent;
+   onCancelClick?: IButtonClickEvent;
 }
 const useStyle = makeStyles(FilterDropdownStyles);
 
 const FilterDropdownActions: React.FunctionComponent<IFilterDropdownActionsProps> = (props) => {
-   const { hideCancel, onApplyClick, onCancelClick, hideApply, className, ...rest } = props;
+   const {
+      hideCancel,
+      onApplyClick,
+      onCancelClick,
+      hideApply,
+      className,
+      disableCancel,
+      disableApply,
+      ...rest
+   } = props;
 
    const classes = useStyle(props);
 
    const buttonsList = [
-      { callback: onCancelClick, hide: hideCancel, label: 'Cancel' },
-      { callback: onApplyClick, hide: hideApply, label: 'Apply' },
+      { callback: onCancelClick, hide: hideCancel, label: 'Cancel', disabled: disableCancel },
+      { callback: onApplyClick, hide: hideApply, label: 'Apply', disabled: disableApply },
    ];
 
    const renderButtons = () =>
-      buttonsList.map((button, index) =>
-         button.hide ? null : (
-            <Grid item key={index}>
+      buttonsList.map((button, index) => (
+         <Grid item key={index}>
+            {button.hide ? null : (
                <Button
+                  disabled={button.disabled}
                   id={button.label}
                   onClick={button.callback}
                   variant={'outlined'}
@@ -34,9 +47,9 @@ const FilterDropdownActions: React.FunctionComponent<IFilterDropdownActionsProps
                >
                   {button.label}
                </Button>
-            </Grid>
-         ),
-      );
+            )}
+         </Grid>
+      ));
 
    return (
       <Grid
