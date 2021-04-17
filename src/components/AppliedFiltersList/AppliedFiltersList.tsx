@@ -1,8 +1,7 @@
-import { Chip, ChipProps, makeStyles } from '@material-ui/core';
+import { ChipProps, makeStyles } from '@material-ui/core';
 import * as React from 'react';
-import { IButtonClickEvent } from '../../shared/interfaces';
 import appliedFiltersListStyles from './appliedFiltersListStyles';
-
+import FilterChip from '../FilterChip/FilterChip';
 export interface IAppliedFiltersListProps {
    chipProps?: ChipProps;
    rootContainerProps?: React.DetailedHTMLProps<
@@ -14,7 +13,7 @@ export interface IAppliedFiltersListProps {
       HTMLLIElement
    >;
    list?: string[];
-   onDelete?: IButtonClickEvent;
+   onDelete?: (label: string) => void;
 }
 
 const useStyle = makeStyles(appliedFiltersListStyles);
@@ -29,11 +28,11 @@ export default function AppliedFiltersList(props: IAppliedFiltersListProps) {
          {list?.map((label) => {
             return (
                <li key={label} {...listContainerProps}>
-                  <Chip
-                     id={label}
+                  <FilterChip
+                     name={label}
+                     square
                      label={label}
-                     onDelete={onDelete}
-                     className={classes.chip}
+                     onDelete={() => onDelete?.(label)}
                      {...chipProps}
                   />
                </li>
