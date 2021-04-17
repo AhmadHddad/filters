@@ -26,10 +26,12 @@ const FiltersListButtons: React.FunctionComponent<IFiltersListButtonsProps> = (p
          {...rest}
       >
          {filtersList?.map((filter) => (
-            <Grid item key={filter.id}>
+            <Grid item key={filter.title}>
                <Button
-                  variant={selectedFilters && selectedFilters[filter.id] ? 'contained' : 'outlined'}
-                  id={filter.id}
+                  variant={
+                     selectedFilters && selectedFilters[filter.title] ? 'contained' : 'outlined'
+                  }
+                  id={filter.title}
                   size="small"
                   color="primary"
                   onClick={onFilterClicked}
