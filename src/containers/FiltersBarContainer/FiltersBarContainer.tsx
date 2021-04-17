@@ -1,11 +1,12 @@
-import { useMediaQuery, Grid } from '@material-ui/core';
+import { useMediaQuery, Grid, makeStyles } from '@material-ui/core';
 import * as React from 'react';
 import attachmentData from '../../attachmentData';
 import FiltersBar from '../../components/FiltersBar/FiltersBar';
-import FilterDropdown from '../../components/FilterDropdown/filterDropdown';
-import { IButtonClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
-import { MORE_FILTERS_FILTER_CAT } from '../../hooks/contants';
+import FilterDropdown from '../../components/FilterDropdown/FilterDropdown';
+import { IButtonClickEvent, IDivClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
+import { MORE_FILTERS_FILTER_CAT } from '../../shared/constants';
 import AppliedFilters from './../../components/AppliedFilters/AppliedFilters';
+import filtersBarContainerStyles from './filtersBarContainerStyles';
 
 interface IFiltersBarContainerProps {}
 
@@ -13,8 +14,11 @@ export type IFilterCat = { label: string; appliedFilters: string[] };
 export type ISelectedFilters = IKeyValueDictionary<boolean>;
 export type IChangedSelectedFiltersCat = IKeyValueDictionary<boolean>;
 
+const useStyle = makeStyles(filtersBarContainerStyles);
+
 const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = (props) => {
    //#region Other Hooks
+   const classes = useStyle(props);
    const isMobile = useMediaQuery('(max-width:600px)');
    const { current: allFiltersCatList } = React.useRef<IFilterCat[]>(
       Object.keys(attachmentData).map((key) => ({
@@ -25,9 +29,9 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
    //#endregion
 
    //#region State
-   const [appliedFilters, setAppliedFilters] = React.useState([]);
+   const [appliedFilters, setAppliedFilters] = React.useState<string[]>([]);
    const [filterCatList, setFilterCatList] = React.useState<IFilterCat[]>([]);
-   const [anchorEl, setAnchorEl] = React.useState(null);
+   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
    const [selectedFilterCat, setSelectedFilterCat] = React.useState('');
    const [selectedFilters, setSelectedFilters] = React.useState<ISelectedFilters>({});
    const [
@@ -56,11 +60,20 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
       },
       [selectedFilterCat],
    );
+
    //#endregion
 
    //#region Callbacks
-   const onFilterCatSelected = React.useCallback<IButtonClickEvent>(
-      (event: React.MouseEvent<any, MouseEvent>) => {
+
+   const onDeleteAppliedFilter = React.useCallback((label: string) => {
+      console.log(
+         '🚀 ~ file: FiltersBarContainer.tsx ~ line 69 ~ onDeleteAppliedFilter ~ label',
+         label,
+      );
+   }, []);
+
+   const onFilterCatSelected = React.useCallback<IDivClickEvent>(
+      (event) => {
          const filterCatLabel: string = event.currentTarget.id;
 
          setSelectedFilterCat(filterCatLabel || '');
@@ -143,6 +156,16 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
 
       setFilterCatList(list);
    }, [isMobile, allFiltersCatList]);
+
+   React.useEffect(() => {
+      const list: string[] = [];
+
+      filterCatList.forEach((cat) => {
+         list.push(...cat.appliedFilters);
+      });
+
+      setAppliedFilters(list);
+   }, [filterCatList]);
    //#endregion
 
    return (
@@ -158,15 +181,17 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
             onApplyFilter={onApplyFilter}
             onCancelClick={onCloseDropdown}
          />
-         <FiltersBar
-            selectedFilterCat={selectedFilterCat}
-            filterCatList={filterCatList}
-            onFilterCatSelected={onFilterCatSelected}
-            isMobile={isMobile}
-         />
-         <Grid container justify={'center'} style={{ flexGrow: 1 }}>
-            <Grid item md={12} xs={12}>
-               <AppliedFilters />
+         <Grid container justify={'center'} className={classes.gridContainer}>
+            <Grid item md={12} xs={12} className={classes.filterBarGridContainer}>
+               <FiltersBar
+                  selectedFilterCat={selectedFilterCat}
+                  filterCatList={filterCatList}
+                  onFilterCatSelected={onFilterCatSelected}
+                  isMobile={isMobile}
+               />
+            </Grid>
+            <Grid item md={12} xs={12} className={classes.appliedFiltersGridContainer}>
+               <AppliedFilters list={appliedFilters} onDelete={onDeleteAppliedFilter} />
             </Grid>
          </Grid>
       </>
