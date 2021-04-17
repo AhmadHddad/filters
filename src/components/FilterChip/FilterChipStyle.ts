@@ -28,6 +28,9 @@ const FilterChipStyle = (theme: Theme) =>
             : {},
       }),
       selected: hoverSelectedStyle,
+      square: {
+         borderRadius: 4,
+      },
    });
 
 export default FilterChipStyle;

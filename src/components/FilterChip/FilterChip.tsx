@@ -8,15 +8,20 @@ const useStyles = makeStyles(filterChipStyle);
 
 export interface IFilterChipProps extends ChipProps {
    selected?: boolean;
+   square?: boolean;
+   name?: string;
 }
 
 const FilterChip: React.FunctionComponent<IFilterChipProps> = (props) => {
-   const { className, selected, ...rest } = props;
+   const { className, selected, square, ...rest } = props;
    const classes = useStyles(props);
 
    return (
       <Chip
-         className={classNames(classes.chip, className, { [classes.selected]: selected })}
+         className={classNames(classes.chip, className, {
+            [classes.selected]: selected,
+            [classes.square]: square,
+         })}
          {...rest}
       />
    );
