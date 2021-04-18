@@ -3,6 +3,7 @@ import * as React from 'react';
 import appliedFiltersListStyles from './appliedFiltersListStyles';
 import FilterChip from '../FilterChip/FilterChip';
 import { IAppliedFilter } from '../../containers/FiltersBarContainer/FiltersBarContainer';
+import { CLEAR_FILTERS_BUTTON_LABEL } from '../../shared/constants';
 export interface IAppliedFiltersListProps {
    chipProps?: ChipProps;
    rootContainerProps?: React.DetailedHTMLProps<
@@ -26,19 +27,21 @@ export default function AppliedFiltersList(props: IAppliedFiltersListProps) {
 
    return (
       <ul className={classes.root} {...rootContainerProps}>
-         {list?.map(({ label, category }) => {
-            return (
-               <li key={label} {...listContainerProps}>
-                  <FilterChip
-                     name={label}
-                     square
-                     label={label}
-                     onDelete={() => onDelete?.(label, category)}
-                     {...chipProps}
-                  />
-               </li>
-            );
-         })}
+         {list
+            ?.concat({ label: CLEAR_FILTERS_BUTTON_LABEL, category: 'none' })
+            ?.map(({ label, category }) => {
+               return (
+                  <li key={label} {...listContainerProps}>
+                     <FilterChip
+                        name={label}
+                        square
+                        label={label}
+                        onDelete={() => onDelete?.(label, category)}
+                        {...chipProps}
+                     />
+                  </li>
+               );
+            })}
       </ul>
    );
 }
