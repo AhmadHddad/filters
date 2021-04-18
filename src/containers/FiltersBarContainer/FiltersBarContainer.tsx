@@ -4,7 +4,7 @@ import attachmentData from '../../attachmentData';
 import FiltersBar from '../../components/FiltersBar/FiltersBar';
 import FilterDropdown from '../../components/FilterDropdown/FilterDropdown';
 import { IButtonClickEvent, IDivClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
-import { MORE_FILTERS_FILTER_CAT } from '../../shared/constants';
+import { CLEAR_FILTERS_BUTTON_LABEL, MORE_FILTERS_FILTER_CAT } from '../../shared/constants';
 import AppliedFilters from './../../components/AppliedFilters/AppliedFilters';
 import filtersBarContainerStyles from './filtersBarContainerStyles';
 
@@ -98,12 +98,16 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
 
    const onDeleteAppliedFilter = React.useCallback(
       (label: string, category: string) => {
-         setFilterCatList(
-            updateFiltersCatList('deleteFilter', {
-               selectedFilterCat: category,
-               labelToDelete: label,
-            }),
-         );
+         if (label === CLEAR_FILTERS_BUTTON_LABEL) {
+            setFilterCatList((prev) => prev.map((cat) => ({ ...cat, appliedFilters: [] })));
+         } else {
+            setFilterCatList(
+               updateFiltersCatList('deleteFilter', {
+                  selectedFilterCat: category,
+                  labelToDelete: label,
+               }),
+            );
+         }
       },
       [updateFiltersCatList],
    );
