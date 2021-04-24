@@ -8,6 +8,7 @@ const appliedFiltersStyles = (theme: Theme) =>
       },
       gridContainer: {
          minHeight: 60,
+         width: '100%',
       },
    });
 
