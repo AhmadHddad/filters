@@ -1,39 +1,33 @@
 import * as React from 'react';
-import { Popover, makeStyles, PopoverProps, PopoverClassKey } from '@material-ui/core';
+import { makeStyles, PopoverClassKey } from '@material-ui/core';
 import filtersPopoverStyles from './filtersPopoverStyles';
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
+import classNames from 'clsx';
+import { IPopoverProps } from '../Popover/Popover';
+import Popover from '../Popover/Popover';
 
-export interface IFiltersPopoverProps extends PopoverProps {}
+export interface IFiltersPopoverProps extends IPopoverProps {
+   fullHeight?: boolean;
+}
 
 const useStyle = makeStyles(filtersPopoverStyles);
 
 export default function FiltersPopover(props: IFiltersPopoverProps) {
-   const { anchorEl, open, children, ...rest } = props;
+   const { open, children, fullHeight, ...rest } = props;
+
    const classes = useStyle(props);
-   const show = Boolean(anchorEl);
 
    const otherClasses: Partial<ClassNameMap<PopoverClassKey>> = rest.classes || {};
 
    return (
       <Popover
-         open={show}
-         anchorEl={anchorEl}
-         transitionDuration={100}
          {...rest}
-         classes={{ paper: classes.paperContainer, ...otherClasses }}
+         classes={{
+            ...otherClasses,
+            paper: classNames(classes.paperContainer, otherClasses.paper),
+         }}
       >
          {children}
       </Popover>
    );
 }
-
-FiltersPopover.defaultProps = {
-   anchorOrigin: {
-      vertical: 'bottom',
-      horizontal: 'center',
-   },
-   transformOrigin: {
-      vertical: 'top',
-      horizontal: 'center',
-   },
-};
