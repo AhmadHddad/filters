@@ -13,19 +13,11 @@ export interface FiltersBarProps {
    filterCatList: IFilterCat[];
    className?: string;
    selectedFilterCat?: string;
-   isMobile?: boolean;
    onFilterCatSelected?: React.MouseEventHandler<any>;
 }
 
 const FiltersBar: React.FunctionComponent<FiltersBarProps> = (props) => {
-   const {
-      className,
-      isMobile,
-      filterCatList,
-      selectedFilterCat,
-      onFilterCatSelected,
-      ...rest
-   } = props;
+   const { className, filterCatList, selectedFilterCat, onFilterCatSelected, ...rest } = props;
    const classes = useStyles(props);
 
    return (

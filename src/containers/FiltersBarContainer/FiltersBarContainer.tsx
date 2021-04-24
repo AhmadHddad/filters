@@ -206,7 +206,6 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
             onClose={onCloseDropdown}
             filtersList={attachmentData[selectedFilterCat]}
             selectedFilters={selectedFilters}
-            isMobile={isMobile}
             onSelectFilter={onSelectFilter}
             onApplyFilter={onApplyFilter}
             onCancelClick={onCloseDropdown}
@@ -217,7 +216,6 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
                   selectedFilterCat={selectedFilterCat}
                   filterCatList={filterCatList}
                   onFilterCatSelected={onFilterCatSelected}
-                  isMobile={isMobile}
                />
             </Grid>
             <Grid item md={12} xs={12} className={classes.appliedFiltersGridContainer}>

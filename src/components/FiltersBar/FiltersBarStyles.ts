@@ -1,12 +1,18 @@
 import { createStyles, Theme } from '@material-ui/core/styles';
-import { FiltersBarProps } from './FiltersBar';
 
 const filtersBarStyles = (theme: Theme) =>
    createStyles({
-      chip: (props: FiltersBarProps) => (props.isMobile ? { width: 'calc(100% / 3.5)' } : {}),
-      bar: (props: FiltersBarProps) => ({
-         justifyContent: props.isMobile ? 'space-between' : 'start',
-      }),
+      bar: {
+         justifyContent: 'start',
+         [theme.breakpoints.down('xs')]: {
+            justifyContent: 'space-between',
+         },
+      },
+      chip: {
+         [theme.breakpoints.down('xs')]: {
+            width: 'calc(100% / 3.5)',
+         },
+      },
    });
 
 export default filtersBarStyles;
