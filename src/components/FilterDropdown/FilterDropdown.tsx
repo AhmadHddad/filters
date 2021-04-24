@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Popover, PopoverProps, Grid, GridProps, makeStyles } from '@material-ui/core';
+import { PopoverProps, Grid, GridProps, makeStyles } from '@material-ui/core';
 import classNames from 'clsx';
-
+import FiltersPopover from '../FiltersPopover/FiltersPopover';
 import { IFiltersList } from '../../attachmentData';
 
 import FiltersListButtons from '../FiltersListButtons/FiltersListButtons';
@@ -17,7 +17,6 @@ export interface IFilterDropdownProps extends PopoverProps {
    onApplyFilter?: IButtonClickEvent;
    onCancelClick?: IButtonClickEvent;
    isChanged?: boolean;
-   isMobile?: boolean;
 }
 
 const useStyle = makeStyles(filterDropdownStyles);
@@ -32,22 +31,14 @@ const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) =>
       onCancelClick,
       filtersList,
       selectedFilters,
-      isMobile,
       isChanged,
       ...rest
    } = props;
 
    const classes = useStyle(props);
-   const show = Boolean(anchorEl);
 
    return (
-      <Popover
-         open={show}
-         anchorEl={anchorEl}
-         transitionDuration={100}
-         classes={{ paper: classes.paperContainer }}
-         {...rest}
-      >
+      <FiltersPopover anchorEl={anchorEl} {...rest}>
          <Grid
             container
             justify="space-between"
@@ -68,7 +59,7 @@ const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) =>
                onCancelClick={onCancelClick}
             />
          </Grid>
-      </Popover>
+      </FiltersPopover>
    );
 };
 
