@@ -43,6 +43,10 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
       changedSelectedFiltersCat,
       setChangedSelectedFiltersCat,
    ] = React.useState<IChangedSelectedFiltersCat>({});
+   const [accordionFiltersCatList] = React.useState<IFilterCat[]>(allFiltersCatList.slice(2));
+   const [showAccordionFiltersCatList, setShowAccordionFiltersCatList] = React.useState<boolean>(
+      false,
+   );
    //#endregion
 
    //#region Other Functions
@@ -118,17 +122,22 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
 
          setSelectedFilterCat(filterCatLabel || '');
          setAnchorEl(event.currentTarget);
-         const prevSelectedFilters: ISelectedFilters = {};
 
-         const prevSelectedFiltersList: string[] =
-            filterCatList.find((filterCat) => filterCat.label === filterCatLabel)?.appliedFilters ||
-            [];
+         if (filterCatLabel === MORE_FILTERS_FILTER_CAT) {
+            setShowAccordionFiltersCatList(true);
+         } else {
+            const prevSelectedFilters: ISelectedFilters = {};
 
-         prevSelectedFiltersList.forEach((label) => {
-            prevSelectedFilters[label] = true;
-         });
+            const prevSelectedFiltersList: string[] =
+               filterCatList.find((filterCat) => filterCat.label === filterCatLabel)
+                  ?.appliedFilters || [];
 
-         setSelectedFilters(prevSelectedFilters);
+            prevSelectedFiltersList.forEach((label) => {
+               prevSelectedFilters[label] = true;
+            });
+
+            setSelectedFilters(prevSelectedFilters);
+         }
       },
       [filterCatList],
    );
@@ -136,6 +145,7 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
    const onCloseDropdown = React.useCallback(() => {
       setAnchorEl(null);
       setSelectedFilterCat('');
+      setShowAccordionFiltersCatList(false);
       setSelectedFilters({});
       setChangedSelectedFiltersCat(toggleChangedSelectedFiltersCat(false));
    }, [toggleChangedSelectedFiltersCat]);
@@ -209,6 +219,8 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
             onSelectFilter={onSelectFilter}
             onApplyFilter={onApplyFilter}
             onCancelClick={onCloseDropdown}
+            showAccordion={showAccordionFiltersCatList}
+            accordionFiltersCatList={accordionFiltersCatList}
          />
          <Grid container justify={'center'} className={classes.gridContainer}>
             <Grid item md={12} xs={12} className={classes.filterBarGridContainer}>
