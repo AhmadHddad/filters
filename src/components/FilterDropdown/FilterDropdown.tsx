@@ -1,50 +1,76 @@
 import * as React from 'react';
-import { PopoverProps, Grid, GridProps, makeStyles } from '@material-ui/core';
-import classNames from 'clsx';
-import FiltersPopover from '../FiltersPopover/FiltersPopover';
-import { IFiltersList } from '../../attachmentData';
+import { GridProps, makeStyles } from '@material-ui/core';
+import attachmentData, { IFiltersList } from '../../attachmentData';
 
-import FiltersListButtons from '../FiltersListButtons/FiltersListButtons';
-import FilterDropdownActions from '../FilterDropdownActions/FilterDropdownActions';
 import { IButtonClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
 import filterDropdownStyles from './filterDropdownStyles';
+import FilterDropdownLayout, { IFilterDropdownLayoutProps } from './FilterDropdownLayout';
+import FiltersListButtons from '../FiltersListButtons/FiltersListButtons';
+import { IFilterCat } from '../../containers/FiltersBarContainer/FiltersBarContainer';
+import Accordion, { IAccordionList } from '../Accordion/Accordion';
+import { Typography } from '@material-ui/core';
 
-export interface IFilterDropdownProps extends PopoverProps {
+export interface IFilterDropdownProps extends IFilterDropdownLayoutProps {
    gridContainerProps?: GridProps;
    filtersList?: IFiltersList;
+   accordionFiltersCatList?: IFilterCat[];
    selectedFilters?: IKeyValueDictionary<boolean>;
    onSelectFilter?: IButtonClickEvent;
    onApplyFilter?: IButtonClickEvent;
    onCancelClick?: IButtonClickEvent;
    isChanged?: boolean;
+   showAccordion?: boolean;
 }
 
 const useStyle = makeStyles(filterDropdownStyles);
 
 const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) => {
    const {
-      anchorEl,
       gridContainerProps,
-      open,
       onSelectFilter,
       onApplyFilter,
       onCancelClick,
       filtersList,
       selectedFilters,
+      accordionFiltersCatList,
       isChanged,
+      showAccordion,
       ...rest
    } = props;
 
    const classes = useStyle(props);
 
+   const [expanded, setExpanded] = React.useState<string>();
+
+   const handleChange = (panel: string) => (event: React.ChangeEvent<{}>, newExpanded: boolean) => {
+      setExpanded(newExpanded ? panel : '');
+   };
+
+   const renderFiltersAccordion = () => {
+      const accordionList: IAccordionList =
+         accordionFiltersCatList?.map((cat) => ({
+            id: cat.label,
+            title: <Typography className={classes.accordionTitle}>{cat.label}</Typography>,
+            body: (
+               <FiltersListButtons
+                  item
+                  filtersList={attachmentData[expanded || '']}
+                  onFilterClicked={onSelectFilter}
+                  selectedFilters={selectedFilters}
+               />
+            ),
+         })) || [];
+
+      return (
+         <Accordion list={accordionList} expandedAccordionId={expanded} onChange={handleChange} />
+      );
+   };
+
    return (
-      <FiltersPopover anchorEl={anchorEl} {...rest}>
-         <Grid
-            container
-            justify="space-between"
-            className={classNames(gridContainerProps?.className, classes.gridContainer)}
-            {...gridContainerProps}
-         >
+      <FilterDropdownLayout fullHeight={showAccordion} {...rest}>
+         {showAccordion ? (
+            renderFiltersAccordion()
+         ) : (
             <FiltersListButtons
                item
                className={classes.buttonsListContainer}
@@ -52,26 +78,9 @@ const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) =>
                onFilterClicked={onSelectFilter}
                selectedFilters={selectedFilters}
             />
-            <FilterDropdownActions
-               disableApply={!isChanged}
-               hideCancel={!isChanged}
-               onApplyClick={onApplyFilter}
-               onCancelClick={onCancelClick}
-            />
-         </Grid>
-      </FiltersPopover>
+         )}
+      </FilterDropdownLayout>
    );
-};
-
-FilterDropdown.defaultProps = {
-   anchorOrigin: {
-      vertical: 'bottom',
-      horizontal: 'center',
-   },
-   transformOrigin: {
-      vertical: 'top',
-      horizontal: 'center',
-   },
 };
 
 export default FilterDropdown;
