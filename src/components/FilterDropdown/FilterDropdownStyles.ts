@@ -9,6 +9,9 @@ const filterDropdownStyles = (theme: Theme) =>
       buttonsListContainer: {
          height: '80%',
       },
+      accordionTitle: {
+         textTransform: 'capitalize',
+      },
    });
 
 export default filterDropdownStyles;
