@@ -43,7 +43,7 @@ const AccordionSummary = withStyles({
 
 const AccordionDetails = withStyles((theme) => ({
    root: {
-      padding: theme.spacing(2),
+      padding: '8px 0px',
    },
 }))(MuiAccordionDetails);
 
@@ -68,7 +68,7 @@ export default function Accordion(props: IAccordionProps) {
    };
 
    return (
-      <div style={{ width: '100%', height: '100%s' }}>
+      <div style={{ width: '100%' }}>
          {list?.map((li) => (
             <StyledAccordion
                key={li.id}
