@@ -1,16 +1,18 @@
 import * as React from 'react';
-import { GridProps, makeStyles } from '@material-ui/core';
 import attachmentData, { IFiltersList } from '../../attachmentData';
 
 import { IButtonClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
 import filterDropdownStyles from './filterDropdownStyles';
-import FilterDropdownLayout, { IFilterDropdownLayoutProps } from './FilterDropdownLayout';
 import FiltersListButtons from '../FiltersListButtons/FiltersListButtons';
 import { IFilterCat } from '../../containers/FiltersBarContainer/FiltersBarContainer';
 import Accordion, { IAccordionList } from '../Accordion/Accordion';
 import { Typography } from '@material-ui/core';
+import { Grid, GridProps, makeStyles } from '@material-ui/core';
+import classNames from 'clsx';
+import FiltersPopover, { IFiltersPopoverProps } from '../FiltersPopover/FiltersPopover';
+import FilterDropdownActions from '../FilterDropdownActions/FilterDropdownActions';
 
-export interface IFilterDropdownProps extends IFilterDropdownLayoutProps {
+export interface IFilterDropdownProps extends IFiltersPopoverProps {
    gridContainerProps?: GridProps;
    filtersList?: IFiltersList;
    accordionFiltersCatList?: IFilterCat[];
@@ -19,7 +21,11 @@ export interface IFilterDropdownProps extends IFilterDropdownLayoutProps {
    onApplyFilter?: IButtonClickEvent;
    onCancelClick?: IButtonClickEvent;
    isChanged?: boolean;
+   onAccordionFilterCatExpanded?: (
+      panel: string,
+   ) => (event: React.ChangeEvent<{}>, newExpanded: boolean) => void;
    showAccordion?: boolean;
+   expandedFiltersCat?: string;
 }
 
 const useStyle = makeStyles(filterDropdownStyles);
@@ -32,19 +38,15 @@ const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) =>
       onCancelClick,
       filtersList,
       selectedFilters,
+      onAccordionFilterCatExpanded,
       accordionFiltersCatList,
       isChanged,
       showAccordion,
+      expandedFiltersCat,
       ...rest
    } = props;
 
    const classes = useStyle(props);
-
-   const [expanded, setExpanded] = React.useState<string>();
-
-   const handleChange = (panel: string) => (event: React.ChangeEvent<{}>, newExpanded: boolean) => {
-      setExpanded(newExpanded ? panel : '');
-   };
 
    const renderFiltersAccordion = () => {
       const accordionList: IAccordionList =
@@ -52,34 +54,65 @@ const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) =>
             id: cat.label,
             title: <Typography className={classes.accordionTitle}>{cat.label}</Typography>,
             body: (
-               <FiltersListButtons
-                  item
-                  filtersList={attachmentData[expanded || '']}
-                  onFilterClicked={onSelectFilter}
-                  selectedFilters={selectedFilters}
-               />
+               <Grid container>
+                  <Grid item md={12} xs={12}>
+                     <FiltersListButtons
+                        item
+                        filtersList={attachmentData[expandedFiltersCat || '']}
+                        onFilterClicked={onSelectFilter}
+                        selectedFilters={selectedFilters}
+                     />
+                  </Grid>
+                  <Grid item md={12} xs={12} className={classes.accordionActions}>
+                     <FilterDropdownActions
+                        disableApply={!isChanged}
+                        hideCancel={!isChanged}
+                        onApplyClick={onApplyFilter}
+                        onCancelClick={onCancelClick}
+                     />
+                  </Grid>
+               </Grid>
             ),
          })) || [];
 
       return (
-         <Accordion list={accordionList} expandedAccordionId={expanded} onChange={handleChange} />
+         <Accordion
+            list={accordionList}
+            expandedAccordionId={expandedFiltersCat}
+            onChange={onAccordionFilterCatExpanded}
+         />
       );
    };
 
    return (
-      <FilterDropdownLayout fullHeight={showAccordion} {...rest}>
-         {showAccordion ? (
-            renderFiltersAccordion()
-         ) : (
-            <FiltersListButtons
-               item
-               className={classes.buttonsListContainer}
-               filtersList={filtersList}
-               onFilterClicked={onSelectFilter}
-               selectedFilters={selectedFilters}
-            />
-         )}
-      </FilterDropdownLayout>
+      <FiltersPopover fullHeight={showAccordion} {...rest}>
+         <Grid
+            container
+            justify="space-between"
+            className={classNames(gridContainerProps?.className, classes.gridContainer)}
+            {...gridContainerProps}
+         >
+            {showAccordion ? (
+               renderFiltersAccordion()
+            ) : (
+               <>
+                  <FiltersListButtons
+                     item
+                     className={classes.buttonsListContainer}
+                     filtersList={filtersList}
+                     onFilterClicked={onSelectFilter}
+                     selectedFilters={selectedFilters}
+                  />
+                  <FilterDropdownActions
+                     disableApply={!isChanged}
+                     hideCancel={!isChanged}
+                     onApplyClick={onApplyFilter}
+                     onCancelClick={onCancelClick}
+                  />
+               </>
+            )}
+         </Grid>
+      </FiltersPopover>
    );
 };
 
