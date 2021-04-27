@@ -12,6 +12,9 @@ const filterDropdownStyles = (theme: Theme) =>
       accordionTitle: {
          textTransform: 'capitalize',
       },
+      accordionActions: {
+         paddingTop: 16,
+      },
    });
 
 export default filterDropdownStyles;
