@@ -25,95 +25,82 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
    //#region Other Hooks
    const classes = useStyle(props);
    const isMobile = useMediaQuery('(max-width:600px)');
-   const { current: allFiltersCatList } = React.useRef<IFilterCat[]>(
-      Object.keys(attachmentData).map((key) => ({
-         label: key,
-         appliedFilters: [] as string[],
-      })),
-   );
+   const { current: allFiltersCatList } = React.useRef<string[]>(Object.keys(attachmentData));
    //#endregion
 
    //#region State
-   const [appliedFilters, setAppliedFilters] = React.useState<IAppliedFilter[]>([]);
-   const [filterCatList, setFilterCatList] = React.useState<IFilterCat[]>([]);
+   const [allAppliedFilters, setAllAppliedFilters] = React.useState<IAppliedFilter[]>([]);
+   const [filterCatList, setFilterCatList] = React.useState<string[]>([]);
    const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
    const [selectedFilterCat, setSelectedFilterCat] = React.useState('');
    const [selectedFilters, setSelectedFilters] = React.useState<ISelectedFilters>({});
+   const [expandedFiltersCat, setExpandedFiltersCat] = React.useState<string>('');
+   const [appliedFiltersCatDictionary, setAppliedFiltersCatDictionary] = React.useState<
+      IKeyValueDictionary<string[]>
+   >({});
+
    const [
       changedSelectedFiltersCat,
       setChangedSelectedFiltersCat,
    ] = React.useState<IChangedSelectedFiltersCat>({});
-   const [accordionFiltersCatList] = React.useState<IFilterCat[]>(allFiltersCatList.slice(2));
+   const [accordionFiltersCatList] = React.useState<string[]>(allFiltersCatList.slice(2));
    const [showAccordionFiltersCatList, setShowAccordionFiltersCatList] = React.useState<boolean>(
       false,
    );
    //#endregion
+   const currentSelectedFilterCat =
+      isMobile && showAccordionFiltersCatList ? expandedFiltersCat : selectedFilterCat;
 
    //#region Other Functions
-   const updateFiltersCatList = React.useCallback(
-      (
-         type: 'deleteFilter' | 'updateCatList',
-         { labelToDelete, selectedFilterCat }: IUpdateFiltersCatListOptionalParameters,
-      ) => (prev: IFilterCat[]) => {
-         const updatedFiltersCatList = [...prev];
-         const prevSelectedFilterCatIndex = prev.findIndex(
-            (cat) => cat.label === selectedFilterCat,
-         );
 
-         if (prevSelectedFilterCatIndex === -1) return prev;
+   const onAccordionFilterCatExpanded = (panel: string) => (
+      event: React.ChangeEvent<{}>,
+      newExpanded: boolean,
+   ) => {
+      setExpandedFiltersCat(newExpanded ? panel : '');
 
-         const updatedFilter = { ...updatedFiltersCatList[prevSelectedFilterCatIndex] };
-
-         switch (type) {
-            case 'deleteFilter':
-               updatedFilter.appliedFilters = updatedFilter.appliedFilters.filter(
-                  (filterLabel) => filterLabel !== labelToDelete,
-               );
-
-               break;
-            case 'updateCatList':
-               updatedFilter.appliedFilters = Object.keys(selectedFilters);
-
-               break;
-            default:
-               break;
-         }
-
-         updatedFiltersCatList[prevSelectedFilterCatIndex] = updatedFilter;
-
-         return updatedFiltersCatList;
-      },
-      [selectedFilters],
-   );
+      if (newExpanded) {
+         handleSelectedFilters(panel);
+      }
+   };
 
    const toggleChangedSelectedFiltersCat = React.useCallback(
       (state: boolean) => {
          return (prevState: IChangedSelectedFiltersCat) => ({
             ...prevState,
-            [selectedFilterCat]: state,
+            [currentSelectedFilterCat]: state,
          });
       },
-      [selectedFilterCat],
+      [currentSelectedFilterCat],
    );
 
    //#endregion
 
    //#region Callbacks
 
-   const onDeleteAppliedFilter = React.useCallback(
-      (label: string, category: string) => {
-         if (label === CLEAR_FILTERS_BUTTON_LABEL) {
-            setFilterCatList((prev) => prev.map((cat) => ({ ...cat, appliedFilters: [] })));
-         } else {
-            setFilterCatList(
-               updateFiltersCatList('deleteFilter', {
-                  selectedFilterCat: category,
-                  labelToDelete: label,
-               }),
-            );
-         }
+   const onDeleteAppliedFilter = React.useCallback((label: string, category: string) => {
+      if (label === CLEAR_FILTERS_BUTTON_LABEL) {
+         setAppliedFiltersCatDictionary({});
+      } else {
+         setAppliedFiltersCatDictionary((prev) => {
+            return { ...prev, [category]: prev[category].filter((filter) => filter !== label) };
+         });
+      }
+   }, []);
+
+   const handleSelectedFilters = React.useCallback(
+      (filterCat: string) => {
+         const prevSelectedFilters: ISelectedFilters = {};
+
+         const prevSelectedFiltersList: string[] = appliedFiltersCatDictionary[filterCat] || [];
+
+         prevSelectedFiltersList.forEach((label) => {
+            prevSelectedFilters[label] = true;
+         });
+
+         setSelectedFilters(prevSelectedFilters);
       },
-      [updateFiltersCatList],
+      [appliedFiltersCatDictionary],
    );
 
    const onFilterCatSelected = React.useCallback<IDivClickEvent>(
@@ -126,20 +113,10 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
          if (filterCatLabel === MORE_FILTERS_FILTER_CAT) {
             setShowAccordionFiltersCatList(true);
          } else {
-            const prevSelectedFilters: ISelectedFilters = {};
-
-            const prevSelectedFiltersList: string[] =
-               filterCatList.find((filterCat) => filterCat.label === filterCatLabel)
-                  ?.appliedFilters || [];
-
-            prevSelectedFiltersList.forEach((label) => {
-               prevSelectedFilters[label] = true;
-            });
-
-            setSelectedFilters(prevSelectedFilters);
+            handleSelectedFilters(filterCatLabel);
          }
       },
-      [filterCatList],
+      [handleSelectedFilters],
    );
 
    const onCloseDropdown = React.useCallback(() => {
@@ -148,20 +125,22 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
       setShowAccordionFiltersCatList(false);
       setSelectedFilters({});
       setChangedSelectedFiltersCat(toggleChangedSelectedFiltersCat(false));
+      setExpandedFiltersCat('');
    }, [toggleChangedSelectedFiltersCat]);
 
    const onApplyFilter = React.useCallback<IButtonClickEvent>(
       (_) => {
-         setFilterCatList(
-            updateFiltersCatList('updateCatList', {
-               selectedFilterCat: selectedFilterCat,
-            }),
-         );
+         setAppliedFiltersCatDictionary((prev) => {
+            return {
+               ...prev,
+               [currentSelectedFilterCat]: Object.keys(selectedFilters),
+            };
+         });
 
          onCloseDropdown();
          setChangedSelectedFiltersCat(toggleChangedSelectedFiltersCat(false));
       },
-      [selectedFilterCat, updateFiltersCatList, onCloseDropdown, toggleChangedSelectedFiltersCat],
+      [onCloseDropdown, toggleChangedSelectedFiltersCat, currentSelectedFilterCat, selectedFilters],
    );
 
    const onSelectFilter = React.useCallback<IButtonClickEvent>(
@@ -188,10 +167,7 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
    //#region LifeCycle
    React.useEffect(() => {
       const list = isMobile
-         ? [
-              ...allFiltersCatList.slice(0, 2),
-              { label: MORE_FILTERS_FILTER_CAT, appliedFilters: [] },
-           ]
+         ? [...allFiltersCatList.slice(0, 2), MORE_FILTERS_FILTER_CAT]
          : allFiltersCatList;
 
       setFilterCatList(list);
@@ -200,25 +176,29 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
    React.useEffect(() => {
       const list: IAppliedFilter[] = [];
 
-      filterCatList.forEach((cat) => {
-         list.push(...cat.appliedFilters.map((filter) => ({ category: cat.label, label: filter })));
-      });
+      for (const key in appliedFiltersCatDictionary) {
+         appliedFiltersCatDictionary[key].forEach((filter) => {
+            list.push({ category: key, label: filter });
+         });
+      }
 
-      setAppliedFilters(list);
-   }, [filterCatList]);
+      setAllAppliedFilters(list);
+   }, [appliedFiltersCatDictionary]);
    //#endregion
 
    return (
       <>
          <FilterDropdown
             anchorEl={anchorEl}
-            isChanged={changedSelectedFiltersCat[selectedFilterCat]}
+            isChanged={changedSelectedFiltersCat[currentSelectedFilterCat]}
             onClose={onCloseDropdown}
             filtersList={attachmentData[selectedFilterCat]}
             selectedFilters={selectedFilters}
             onSelectFilter={onSelectFilter}
             onApplyFilter={onApplyFilter}
+            expandedFiltersCat={expandedFiltersCat}
             onCancelClick={onCloseDropdown}
+            onAccordionFilterCatExpanded={onAccordionFilterCatExpanded}
             showAccordion={showAccordionFiltersCatList}
             accordionFiltersCatList={accordionFiltersCatList}
          />
@@ -226,12 +206,13 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
             <Grid item md={12} xs={12} className={classes.filterBarGridContainer}>
                <FiltersBar
                   selectedFilterCat={selectedFilterCat}
+                  appliedFiltersCatDictionary={appliedFiltersCatDictionary}
                   filterCatList={filterCatList}
                   onFilterCatSelected={onFilterCatSelected}
                />
             </Grid>
             <Grid item md={12} xs={12} className={classes.appliedFiltersGridContainer}>
-               <AppliedFilters list={appliedFilters} onDelete={onDeleteAppliedFilter} />
+               <AppliedFilters list={allAppliedFilters} onDelete={onDeleteAppliedFilter} />
             </Grid>
          </Grid>
       </>
