@@ -4,7 +4,6 @@ import attachmentData, { IFiltersList } from '../../attachmentData';
 import { IButtonClickEvent, IKeyValueDictionary } from '../../shared/interfaces';
 import filterDropdownStyles from './filterDropdownStyles';
 import FiltersListButtons from '../FiltersListButtons/FiltersListButtons';
-import { IFilterCat } from '../../containers/FiltersBarContainer/FiltersBarContainer';
 import Accordion, { IAccordionList } from '../Accordion/Accordion';
 import { Typography } from '@material-ui/core';
 import { Grid, GridProps, makeStyles } from '@material-ui/core';
@@ -15,7 +14,7 @@ import FilterDropdownActions from '../FilterDropdownActions/FilterDropdownAction
 export interface IFilterDropdownProps extends IFiltersPopoverProps {
    gridContainerProps?: GridProps;
    filtersList?: IFiltersList;
-   accordionFiltersCatList?: IFilterCat[];
+   accordionFiltersCatList?: string[];
    selectedFilters?: IKeyValueDictionary<boolean>;
    onSelectFilter?: IButtonClickEvent;
    onApplyFilter?: IButtonClickEvent;
@@ -51,8 +50,8 @@ const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) =>
    const renderFiltersAccordion = () => {
       const accordionList: IAccordionList =
          accordionFiltersCatList?.map((cat) => ({
-            id: cat.label,
-            title: <Typography className={classes.accordionTitle}>{cat.label}</Typography>,
+            id: cat,
+            title: <Typography className={classes.accordionTitle}>{cat}</Typography>,
             body: (
                <Grid container>
                   <Grid item md={12} xs={12}>
