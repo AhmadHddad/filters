@@ -4,30 +4,42 @@ import classNames from 'clsx';
 
 import Bar from '../Bar/Bar';
 import FilterChip from '../FilterChip/FilterChip';
-import { IFilterCat } from '../../containers/FiltersBarContainer/FiltersBarContainer';
 import filtersBarStyles from './filtersBarStyles';
+import { IKeyValueDictionary } from '../../shared/interfaces';
 
 const useStyles = makeStyles(filtersBarStyles);
 
 export interface FiltersBarProps {
-   filterCatList: IFilterCat[];
+   filterCatList: string[];
    className?: string;
    selectedFilterCat?: string;
+   appliedFiltersCatDictionary?: IKeyValueDictionary<string[]>;
    onFilterCatSelected?: React.MouseEventHandler<any>;
 }
 
 const FiltersBar: React.FunctionComponent<FiltersBarProps> = (props) => {
-   const { className, filterCatList, selectedFilterCat, onFilterCatSelected, ...rest } = props;
+   const {
+      className,
+      filterCatList,
+      appliedFiltersCatDictionary,
+      selectedFilterCat,
+      onFilterCatSelected,
+      ...rest
+   } = props;
    const classes = useStyles(props);
 
    return (
       <Bar className={classNames(classes.bar, className)} {...rest}>
-         {filterCatList.map(({ label, appliedFilters }) => (
+         {filterCatList.map((label) => (
             <FilterChip
                className={classes.chip}
                selected={selectedFilterCat === label}
                key={label}
-               label={`${label} ${appliedFilters.length > 0 ? `(${appliedFilters.length})` : ''}`}
+               label={`${label} ${
+                  (appliedFiltersCatDictionary?.[label] || []).length > 0
+                     ? `(${(appliedFiltersCatDictionary?.[label] || []).length})`
+                     : ''
+               }`}
                id={label}
                onClick={onFilterCatSelected}
             />
