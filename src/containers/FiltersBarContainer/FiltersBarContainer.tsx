@@ -18,7 +18,7 @@ export type IUpdateFiltersCatListOptionalParameters = {
    labelToDelete?: string;
    selectedFilterCat: string;
 };
-
+export type IAppliedFilterCatDictionary = IKeyValueDictionary<string[]>;
 const useStyle = makeStyles(filtersBarContainerStyles);
 
 const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = (props) => {
@@ -35,9 +35,10 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
    const [selectedFilterCat, setSelectedFilterCat] = React.useState('');
    const [selectedFilters, setSelectedFilters] = React.useState<ISelectedFilters>({});
    const [expandedFiltersCat, setExpandedFiltersCat] = React.useState<string>('');
-   const [appliedFiltersCatDictionary, setAppliedFiltersCatDictionary] = React.useState<
-      IKeyValueDictionary<string[]>
-   >({});
+   const [
+      appliedFiltersCatDictionary,
+      setAppliedFiltersCatDictionary,
+   ] = React.useState<IAppliedFilterCatDictionary>({});
 
    const [
       changedSelectedFiltersCat,
@@ -196,6 +197,7 @@ const FiltersBarContainer: React.FunctionComponent<IFiltersBarContainerProps> = 
             selectedFilters={selectedFilters}
             onSelectFilter={onSelectFilter}
             onApplyFilter={onApplyFilter}
+            appliedFiltersCatDictionary={appliedFiltersCatDictionary}
             expandedFiltersCat={expandedFiltersCat}
             onCancelClick={onCloseDropdown}
             onAccordionFilterCatExpanded={onAccordionFilterCatExpanded}
