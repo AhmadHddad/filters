@@ -10,6 +10,7 @@ import { Grid, GridProps, makeStyles } from '@material-ui/core';
 import classNames from 'clsx';
 import FiltersPopover, { IFiltersPopoverProps } from '../FiltersPopover/FiltersPopover';
 import FilterDropdownActions from '../FilterDropdownActions/FilterDropdownActions';
+import { IAppliedFilterCatDictionary } from '../../containers/FiltersBarContainer/FiltersBarContainer';
 
 export interface IFilterDropdownProps extends IFiltersPopoverProps {
    gridContainerProps?: GridProps;
@@ -17,6 +18,7 @@ export interface IFilterDropdownProps extends IFiltersPopoverProps {
    accordionFiltersCatList?: string[];
    selectedFilters?: IKeyValueDictionary<boolean>;
    onSelectFilter?: IButtonClickEvent;
+   appliedFiltersCatDictionary?: IAppliedFilterCatDictionary;
    onApplyFilter?: IButtonClickEvent;
    onCancelClick?: IButtonClickEvent;
    isChanged?: boolean;
@@ -38,6 +40,7 @@ const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) =>
       filtersList,
       selectedFilters,
       onAccordionFilterCatExpanded,
+      appliedFiltersCatDictionary,
       accordionFiltersCatList,
       isChanged,
       showAccordion,
@@ -49,30 +52,37 @@ const FilterDropdown: React.FunctionComponent<IFilterDropdownProps> = (props) =>
 
    const renderFiltersAccordion = () => {
       const accordionList: IAccordionList =
-         accordionFiltersCatList?.map((cat) => ({
-            id: cat,
-            title: <Typography className={classes.accordionTitle}>{cat}</Typography>,
-            body: (
-               <Grid container>
-                  <Grid item md={12} xs={12}>
-                     <FiltersListButtons
-                        item
-                        filtersList={attachmentData[expandedFiltersCat || '']}
-                        onFilterClicked={onSelectFilter}
-                        selectedFilters={selectedFilters}
-                     />
+         accordionFiltersCatList?.map((cat) => {
+            const appliedFiltersCount = appliedFiltersCatDictionary?.[cat]?.length || 0;
+            return {
+               id: cat,
+               title: (
+                  <Typography className={classes.accordionTitle}>
+                     {cat} {appliedFiltersCount > 0 ? `(${appliedFiltersCount})` : ''}
+                  </Typography>
+               ),
+               body: (
+                  <Grid container>
+                     <Grid item md={12} xs={12}>
+                        <FiltersListButtons
+                           item
+                           filtersList={attachmentData[expandedFiltersCat || '']}
+                           onFilterClicked={onSelectFilter}
+                           selectedFilters={selectedFilters}
+                        />
+                     </Grid>
+                     <Grid item md={12} xs={12} className={classes.accordionActions}>
+                        <FilterDropdownActions
+                           disableApply={!isChanged}
+                           hideCancel={!isChanged}
+                           onApplyClick={onApplyFilter}
+                           onCancelClick={onCancelClick}
+                        />
+                     </Grid>
                   </Grid>
-                  <Grid item md={12} xs={12} className={classes.accordionActions}>
-                     <FilterDropdownActions
-                        disableApply={!isChanged}
-                        hideCancel={!isChanged}
-                        onApplyClick={onApplyFilter}
-                        onCancelClick={onCancelClick}
-                     />
-                  </Grid>
-               </Grid>
-            ),
-         })) || [];
+               ),
+            };
+         }) || [];
 
       return (
          <Accordion
